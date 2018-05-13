@@ -1,0 +1,41 @@
+version: "2"
+services:
+ mysql:
+   image: 'mysql:5.6.35'
+   environment:
+    MYSQL_ROOT_PASSWORD: "password"
+    MYSQL_DATABASE: docker
+   expose:
+   - 8006
+   ports:
+   - 8006:3306
+   volumes: 
+   - ../mysql:/var/lib/mysql
+ php70: 
+   build: ./php70/
+   links:
+    - mysql:mysqldb
+   volumes:
+    - ../www:/var/www/html
+    - ./php70/php.ini-production:/usr/local/etc/php/php.ini
+ apache70:
+   build: ./apache/
+   links: 
+    - php70:phpfpm
+   volumes: 
+   - ../www:/var/www/html
+   expose:
+   - 8070
+   ports:
+   - 8070:80
+ phpmyadmin:
+   image: phpmyadmin/phpmyadmin
+   links:
+    - mysql
+   environment:
+    PMA_HOST: mysql
+    PMA_PORT: 3306
+   expose:
+    - 8001   
+   ports:
+    - "8001:80"
